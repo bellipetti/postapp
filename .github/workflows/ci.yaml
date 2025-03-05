@@ -1,0 +1,72 @@
+name: Build, Push, and Update Deployment #GitHub Actions 에서 수행할 워크플로우 이름
+
+on:   # GitHub Actions 워크플로우 실행 조건
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:      # 여러개의 작업을 정의할 수 있다.
+  build:   # 작업을 정의 : build
+    runs-on: ubuntu-20.04   #  워크플로우가 실행될 VM 이 사용할 운영체제
+    steps:   #  GitHub Actions 워크플로우에서 하나의 job(작업) 내에서 실행될 개별적인 작업 단위
+      - name: Checkout repository    # 1단게 : 명령어를 실행하거나 (run), GitHub에서 제공하는 액션(action)을 사용 실행
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17     # 2단계
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+          
+      - name: Grant execute permission for Gradle Wrapper
+        run: |
+          chmod +x gradlew
+          git add gradlew
+          git diff --quiet gradlew || (git commit -m "Fix gradlew file permissions" && git push https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git HEAD:$(echo ${{ github.ref }} | sed 's/refs\/heads\///'))
+
+      - name: Cache Gradle packages  #  Gradle 캐싱 설정 : Gradle 빌드 속도 최적화
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build with Gradle Wrapper
+        run: ./gradlew build -x test
+         
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+    
+      - name: Build, tag, and push image to Docker Hub
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_REPOSITORY: postapp
+          IMAGE_TAG: ${{ github.sha }}   # 현재 실행 중인 커밋의 SHA 값 (고유한 해시 값) 
+        run: |
+          docker build -t $DOCKER_HUB_USERNAME/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG .
+          docker push $DOCKER_HUB_USERNAME/$DOCKER_HUB_REPOSITORY:$IMAGE_TAG
+      
+      - name: Update Deployment YAML
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_REPOSITORY: postapp
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          sed -i "s|image: .*|image: $DOCKER_HUB_USERNAME/$DOCKER_HUB_REPOSITORY:${IMAGE_TAG}|" k8s/postapp-deployment.yaml
+
+      - name: Commit and push if there are changes
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions@github.com'
+          git add k8s/postapp-deployment.yaml gradlew
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update image tag to ${{ github.sha }}" && git push https://${{ secrets.PAT }}@github.com/${{ github.repository }}.git HEAD:$(echo ${{ github.ref }} | sed 's/refs\/heads\///'))

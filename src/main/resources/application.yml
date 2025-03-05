@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: postapp
+
+  # DB 연결 정보
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql-service.postapp.svc.cluster.local:3306/lab_board?serverTimezone=Asia/Seoul&characterEncoding=utf8
+    username: root
+    password: 1234
+ 
+ 
+  # JPA 설정  
+  jpa:
+    hibernate:
+      ddl-auto: update   
+    # show-sql: true     # 콘솔에 출력
+    properties:
+      hibernate:       
+        '[format_sql]': true
+        '[default_batch_fetch_size]': 20  # 글로벌 Batch Size 설정 (JPA에서 지연 로딩(Lazy Loading) 최적화를 위해 사용한다.)
+
+# Logging
+logging:
+  level:
+    '[org.hibernate.SQL]': debug             # SQL문 로그 출력
+    '[org.hibernate.orm.jdbc.bind]': trace   # 중요 : 바인딩된 값 출력

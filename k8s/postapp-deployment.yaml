@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: post-deploy
+  namespace: postapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: post-pod
+  template:
+    metadata:
+      labels:
+        app: post-pod
+    spec:      
+      containers:
+        - name: post-container
+          image: hjpush/postapp:v1
+          ports:
+            - containerPort: 8080
+          
+---          
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: post-service
+  namespace: postapp
+spec:
+  selector:
+    app: post-pod
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 32080
+  type: NodePort
+
+
+

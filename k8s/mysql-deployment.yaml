@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deploy
+  namespace: postapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-pod
+  template:
+    metadata:
+      labels:
+        app: mysql-pod
+    spec:
+      containers:
+        - name: mysql-container
+          image: mysql:8.0.41
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "1234"
+            - name: MYSQL_DATABASE  
+              value: lab_board
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+      volumes:  
+        - name: mysql-storage
+          hostPath:
+            path: /data/mysql
+            type: DirectoryOrCreate
+
+--- 
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: postapp
+spec:
+  selector:
+    app: mysql-pod
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP
