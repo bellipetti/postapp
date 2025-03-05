@@ -15,7 +15,7 @@ spec:
     spec:      
       containers:
         - name: post-container
-          image: hjpush/postapp:v1
+          image: bellipetti/postapp:V490
           ports:
             - containerPort: 8080
           
