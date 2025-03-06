@@ -15,7 +15,7 @@ spec:
     spec:      
       containers:
         - name: post-container
-          image: bellipetti/postapp:3eb20f13553a6f15a787562dac43d22921ce8c6b
+          image: bellipetti/postapp:V490
           ports:
             - containerPort: 8080
           
