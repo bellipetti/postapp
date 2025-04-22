@@ -10,7 +10,7 @@ on:   # GitHub Actions 워크플로우 실행 조건
 
 jobs:      # 여러개의 작업을 정의할 수 있다.
   build:   # 작업을 정의 : build
-    runs-on: ubuntu-20.04   #  워크플로우가 실행될 VM 이 사용할 운영체제
+    runs-on: ubuntu-22.04   #  워크플로우가 실행될 VM 이 사용할 운영체제
     steps:   #  GitHub Actions 워크플로우에서 하나의 job(작업) 내에서 실행될 개별적인 작업 단위
       - name: Checkout repository    # 1단게 : 명령어를 실행하거나 (run), GitHub에서 제공하는 액션(action)을 사용 실행
         uses: actions/checkout@v3
