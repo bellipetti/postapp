@@ -79,7 +79,7 @@ public class PostController {
 
     // 게시글 삭제 http://localhost:8080/api/v1/posts/48
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable("id") int id) {
+    public ResponseEntity<String> deletePost(@PathVariable("id") Long id) {
         postService.removePost(id);
         return new ResponseEntity<>("", HttpStatus.NO_CONTENT);
     }

@@ -17,7 +17,8 @@ public interface PostService {
     // 게시글 상세 조회
     PostDto retrivePostById(Long id);
 
-    void removePost(int id); // 삭제
+    void removePost(Long id); // 삭제
+    
 
     // PostDto => Post 엔티티 변환
     default Post dtoToEntity(PostDto dto) {
