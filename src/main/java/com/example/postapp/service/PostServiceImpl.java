@@ -71,28 +71,12 @@ public class PostServiceImpl implements PostService {
         return postDto;
     }
 
+        // 게시글 삭제 http://localhost:8080/api/v1/posts/list/2
+        @Transactional(readOnly = false)
+        @Override
+        public void removePost(int id) {
+            postrepository.deleteById(id);
+        }
+
+
 }
-
-// @Override
-// public PageResponseDto<PostDto> paging(PageRequestDto pageRequestDto) {
-
-// PageRequest pageable = PageRequest.of(pageRequestDto.getPage() - 1,
-// pageRequestDto.getSize(),
-// Sort.by("id").descending());
-
-// Page<Post> page = postrepository.findAll(pageable);
-
-// // List<Post> post = page.getContent();
-
-// List<PostDto> posts = page.get().map(post ->
-// EntityToDto(post)).collect(Collectors.toList());
-
-// long totalCount = page.getTotalElements();
-
-// return PageResponseDto.<PostDto>builder()
-// .dtoList(posts)
-// .pageRequestDto(pageRequestDto)
-// .totalCount(totalCount)
-// .build();
-
-// }

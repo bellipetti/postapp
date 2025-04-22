@@ -17,6 +17,7 @@ import com.example.postapp.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,18 +51,6 @@ public class PostController {
         return new ResponseEntity<>(Map.of("id", id), HttpStatus.CREATED);
     }
 
-    // // 페이징 처리
-    // @GetMapping("/posts")
-    // public ResponseEntity<PageResponseDto<PostDto>> getPosts(PageRequestDto
-    // pageRequestDto) {
-    // log.info("page : {}, size : {}", pageRequestDto.getPage(),
-    // pageRequestDto.getSize());
-
-    // PageResponseDto<PostDto> result = postService.paging(pageRequestDto);
-
-    // return new ResponseEntity<>(result, HttpStatus.OK);
-    // }
-
     // 검색과 페이징 처리
     @GetMapping("/posts")
     public ResponseEntity<PageResponseDto<PostDto>> getPosts(
@@ -86,6 +75,13 @@ public class PostController {
         PageResponseDto<PostDto> result = postService.paging(condition, pageRequestDto);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // 게시글 삭제 http://localhost:8080/api/v1/posts/48
+    @DeleteMapping("/posts/{id}")
+    public ResponseEntity<String> deletePost(@PathVariable("id") int id) {
+        postService.removePost(id);
+        return new ResponseEntity<>("", HttpStatus.NO_CONTENT);
     }
 
 }
