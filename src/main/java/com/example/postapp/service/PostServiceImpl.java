@@ -71,12 +71,11 @@ public class PostServiceImpl implements PostService {
         return postDto;
     }
 
-        // 게시글 삭제 http://localhost:8080/api/v1/posts/list/2
-        @Transactional(readOnly = false)
-        @Override
-        public void removePost(int id) {
-            postrepository.deleteById(id);
-        }
-
+    // 게시글 삭제 http://localhost:8080/api/v1/posts/list/2
+    @Transactional(readOnly = false)
+    @Override
+    public void removePost(int id) {
+        postrepository.deleteById(id);
+    }
 
 }
